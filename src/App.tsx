@@ -13,7 +13,8 @@ import {
   ArrowUp,
   Twitter,
   Instagram,
-  Linkedin
+  Linkedin,
+  X
 } from 'lucide-react';
 
 const translations = {
@@ -48,17 +49,28 @@ const translations = {
     team: {
       title: "THE TEAM",
       members: [
-        { name: "JODY", role: "CREATIVE\nDIRECTOR", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80" },
-        { name: "EMINAM", role: "FOUNDING\nDEVELOPER", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80" },
-        { name: "TIEN", role: "FOUNDING\nDEVELOPER", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80" }
+        { name: "JODY", role: "FOUNDER &\nCREATIVE DIRECTOR", img: "/images/J.jpg" },
+        { name: "EMINAM", role: "FOUNDING\nDEVELOPER", img: "/images/N.png" },
+        { name: "TIEN", role: "FOUNDING\nDEVELOPER", img: "/images/T.png" }
       ]
     },
     cta: {
       title: "READY TO\nEMBRACE THE FUTURE?",
       button: "WORK WITH US"
     },
+    contact: {
+      title: "WORK WITH US",
+      name: "Name",
+      phone: "Phone Number",
+      email: "Email Address",
+      message: "Message",
+      submit: "SEND MESSAGE",
+      submitting: "SENDING...",
+      success: "Message sent successfully!",
+      close: "Close"
+    },
     footer: {
-      copyright: "© 2023 Neon Shaman Studios. Hoi An, Vietnam."
+      copyright: "© 2026 Neon Shaman Studios. Hoi An, Vietnam."
     }
   },
   vi: {
@@ -92,14 +104,25 @@ const translations = {
     team: {
       title: "ĐỘI NGŨ",
       members: [
-        { name: "JODY", role: "GIÁM ĐỐC\nSÁNG TẠO", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80" },
-        { name: "EMINAM", role: "NHÀ PHÁT TRIỂN\nSÁNG LẬP", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80" },
-        { name: "TIEN", role: "NHÀ PHÁT TRIỂN\nSÁNG LẬP", img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80" }
+        { name: "JODY", role: "NGƯỜI SÁNG LẬP &\nGIÁM ĐỐC SÁNG TẠO", img: "/images/J.jpg" },
+        { name: "EMINAM", role: "NHÀ PHÁT TRIỂN\nSÁNG LẬP", img: "/images/N.png" },
+        { name: "TIEN", role: "NHÀ PHÁT TRIỂN\nSÁNG LẬP", img: "/images/T.png" }
       ]
     },
     cta: {
       title: "SẴN SÀNG ĐÓN NHẬN\nTƯƠNG LAI?",
       button: "HỢP TÁC VỚI CHÚNG TÔI"
+    },
+    contact: {
+      title: "HỢP TÁC VỚI CHÚNG TÔI",
+      name: "Họ và tên",
+      phone: "Số điện thoại",
+      email: "Địa chỉ Email",
+      message: "Tin nhắn",
+      submit: "GỬI TIN NHẮN",
+      submitting: "ĐANG GỬI...",
+      success: "Tin nhắn đã được gửi thành công!",
+      close: "Đóng"
     },
     footer: {
       copyright: "© 2023 Neon Shaman Studios. Hội An, Việt Nam."
@@ -130,6 +153,15 @@ export default function App() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    message: ''
+  });
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     if (latest > 0.05) {
@@ -143,15 +175,67 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          // NOTE: To make this work, go to web3forms.com, enter jodycoombes@gmail.com, 
+          // get your free access key, and paste it here:
+          access_key: "1f6d556a-5b83-437d-b41c-f6586fa0f8b3",
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          message: formData.message,
+          subject: `New Contact from ${formData.name} - Neon Shaman Studios`,
+          from_name: "Neon Shaman Studios Website"
+        }),
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setIsSubmitted(true);
+        setTimeout(() => {
+          setIsContactModalOpen(false);
+          setIsSubmitted(false);
+          setFormData({ name: '', phone: '', email: '', message: '' });
+        }, 2000);
+      } else {
+        console.error("Form submission error:", result);
+        alert("Something went wrong. Please try again or email us directly.");
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
+      alert("Something went wrong. Please try again or email us directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+
   return (
     <div className="min-h-screen bg-dark-bg text-white font-sans selection:bg-neon-pink selection:text-white">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-dark-bg/80 backdrop-blur-md border-b border-white/5">
         <div className="flex items-center gap-2">
-          <div className="font-display font-bold text-xl tracking-wider flex flex-col leading-none">
-            <span>NEON SHAMAN</span>
-            <span className="text-[0.5rem] tracking-[0.3em] text-gray-400 ml-1">STUDIOS</span>
-          </div>
+          {/* Replace src with your actual logo path, e.g., /logo.png if placed in the public folder */}
+          <img 
+            src="/images/logo.png" 
+            alt="Neon Shaman Studios" 
+            className="h-8 md:h-10 w-auto object-contain"
+          />
         </div>
         <div className="flex items-center gap-4">
           <button 
@@ -209,6 +293,7 @@ export default function App() {
             transition={{ duration: 0.5, delay: 0.6 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => setIsContactModalOpen(true)}
             className="bg-neon-pink text-white font-display font-semibold tracking-wider px-6 py-3 md:px-8 md:py-4 rounded-full shadow-[0_0_20px_rgba(255,0,85,0.4)] hover:shadow-[0_0_30px_rgba(255,0,85,0.6)] transition-all"
           >
             {t.hero.cta}
@@ -318,21 +403,30 @@ export default function App() {
           <h2 className="font-display text-2xl md:text-3xl font-bold tracking-wide mb-4">{t.experience.title}</h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 items-center justify-items-center opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-          {/* Simulated Logos */}
-          <motion.div whileHover={{ scale: 1.1 }} className="font-display font-bold italic text-2xl md:text-3xl">EA GAMES</motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} className="font-display tracking-[0.2em] text-xl md:text-2xl">ACTIVISION</motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} className="font-sans font-bold italic text-xl md:text-2xl">CODEMASTERS</motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} className="font-sans font-black bg-white text-black px-3 py-1 text-2xl md:text-3xl">NHS</motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} className="font-sans font-bold bg-red-600 text-white px-4 py-1 rounded-t-full rounded-b-md text-xl md:text-2xl">Levi's</motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} className="font-sans font-black text-white text-3xl md:text-4xl tracking-tighter">AMD</motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} className="flex items-center gap-2">
-            <span className="font-sans font-black text-orange-500 text-3xl md:text-4xl italic">FPT</span>
-            <span className="text-xs max-w-[50px] leading-tight">Fpt University</span>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 items-center justify-items-center opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+          <motion.div whileHover={{ scale: 1.1 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/ea.png" alt="EA Games" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
           </motion.div>
-          <motion.div whileHover={{ scale: 1.1 }} className="font-serif text-red-600 text-center leading-tight">
-            <div className="text-xl md:text-2xl font-bold">SWINBURNE</div>
-            <div className="text-[0.6rem] tracking-widest">UNIVERSITY OF TECHNOLOGY</div>
+          <motion.div whileHover={{ scale: 1.3 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/activision.png" alt="Activision" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/codemasters.png" alt="Codemasters" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/nhs.png" alt="NHS" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/levis.png" alt="Levi's" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/amd.png" alt="AMD" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/fpt.png" alt="FPT University" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.1 }} className="w-full flex justify-center items-center h-16 md:h-24">
+            <img src="/images/swinburne.png" alt="Swinburne University" className="max-h-12 md:max-h-16 max-w-[120px] md:max-w-[160px] object-contain" />
           </motion.div>
         </div>
       </section>
@@ -354,20 +448,18 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="bg-card-bg rounded-3xl overflow-hidden border border-white/5 hover:border-white/20 transition-colors group"
+                className="bg-[#1A1A1A] rounded-[2rem] overflow-hidden border border-white/5 hover:border-neon-pink/30 transition-colors group p-8 md:p-12 flex flex-col items-center text-center box-glow-hover"
               >
-                <div className="aspect-[4/5] overflow-hidden">
+                <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden mb-6 border-2 border-white/10 group-hover:border-neon-pink/50 transition-colors">
                   <img 
                     src={member.img} 
                     alt={member.name} 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
                     referrerPolicy="no-referrer"
                   />
                 </div>
-                <div className="p-8 text-center flex flex-col items-center bg-[#1A1A1A]">
-                  <h3 className="font-display font-bold text-2xl mb-2 tracking-wider uppercase">{member.name}</h3>
-                  <p className="text-gray-400 font-display text-xs tracking-[0.2em] whitespace-pre-line leading-relaxed uppercase">{member.role}</p>
-                </div>
+                <h3 className="font-display font-bold text-xl mb-2 tracking-wider uppercase">{member.name}</h3>
+                <p className="text-gray-400 font-display text-xs tracking-[0.2em] whitespace-pre-line leading-relaxed uppercase">{member.role}</p>
               </motion.div>
             ))}
           </div>
@@ -396,6 +488,7 @@ export default function App() {
             transition={{ duration: 0.6, delay: 0.2 }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => setIsContactModalOpen(true)}
             className="flex items-center gap-3 bg-neon-pink text-white font-display font-semibold tracking-wider px-8 py-4 rounded-full shadow-[0_0_20px_rgba(255,0,85,0.4)] hover:shadow-[0_0_30px_rgba(255,0,85,0.6)] transition-all"
           >
             {t.cta.button}
@@ -437,6 +530,103 @@ export default function App() {
           >
             <ArrowUp className="w-5 h-5 md:w-6 md:h-6" />
           </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Contact Modal */}
+      <AnimatePresence>
+        {isContactModalOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm overflow-y-auto"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-[#121212] border border-white/10 rounded-3xl p-6 md:p-8 w-full max-w-md relative shadow-2xl my-auto"
+            >
+              <button 
+                onClick={() => setIsContactModalOpen(false)}
+                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors p-2"
+                aria-label={t.contact.close}
+              >
+                <X className="w-8 h-8" />
+              </button>
+
+              <h2 className="font-display text-xl md:text-2xl font-bold tracking-wide mb-6 text-center">{t.contact.title}</h2>
+
+              {isSubmitted ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center py-12"
+                >
+                  <div className="w-16 h-16 rounded-full bg-neon-pink/20 flex items-center justify-center mx-auto mb-6">
+                    <svg className="w-8 h-8 text-neon-pink" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <p className="text-xl font-medium">{t.contact.success}</p>
+                </motion.div>
+              ) : (
+                <form onSubmit={handleContactSubmit} className="flex flex-col gap-4">
+                  <div>
+                    <label htmlFor="name" className="block text-xs font-medium text-gray-400 mb-1.5">{t.contact.name}</label>
+                    <input 
+                      type="text" 
+                      id="name" 
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/50 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="phone" className="block text-xs font-medium text-gray-400 mb-1.5">{t.contact.phone}</label>
+                    <input 
+                      type="tel" 
+                      id="phone" 
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/50 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-xs font-medium text-gray-400 mb-1.5">{t.contact.email}</label>
+                    <input 
+                      type="email" 
+                      id="email" 
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/50 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="block text-xs font-medium text-gray-400 mb-1.5">{t.contact.message}</label>
+                    <textarea 
+                      id="message" 
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                      rows={3}
+                      className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neon-pink/50 focus:ring-1 focus:ring-neon-pink/50 transition-all resize-none"
+                    ></textarea>
+                  </div>
+                  <button 
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-2 bg-neon-pink hover:bg-neon-pink/80 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-6 rounded-xl tracking-widest text-sm transition-all shadow-[0_0_15px_rgba(255,42,109,0.3)] w-full"
+                  >
+                    {isSubmitting ? t.contact.submitting : t.contact.submit}
+                  </button>
+                </form>
+              )}
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

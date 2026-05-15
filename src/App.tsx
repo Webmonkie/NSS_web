@@ -1,3 +1,4 @@
+import type { FormEvent, ChangeEvent } from 'react';
 import { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence, useMotionValueEvent } from 'motion/react';
 import { 
@@ -50,8 +51,6 @@ const translations = {
       title: "THE TEAM",
       members: [
         { name: "JODY", role: "FOUNDER &\nCREATIVE DIRECTOR", img: "/images/J.jpg" },
-        { name: "EMINAM", role: "FOUNDING\nDEVELOPER", img: "/images/N.png" },
-        { name: "TIEN", role: "FOUNDING\nDEVELOPER", img: "/images/T.png" }
       ]
     },
     cta: {
@@ -72,71 +71,15 @@ const translations = {
     footer: {
       copyright: "© 2026 Neon Shaman Studios. Hoi An, Vietnam."
     }
-  },
-  vi: {
-    hero: {
-      title: "STUDIO SÁNG TẠO\nFULL-STACK ĐẦU TIÊN\nTẠI VIỆT NAM",
-      subtitle: "Nơi <span class='text-neon-pink font-semibold'>hơn 20 năm kinh nghiệm sáng tạo</span> hội tụ cùng <span class='text-neon-pink font-semibold'>thế hệ tài năng trẻ Việt Nam</span>. Một trung tâm sức mạnh full-stack được thúc đẩy bởi AI, bắt nguồn từ trái tim Hội An.",
-      cta: "HỢP TÁC VỚI CHÚNG TÔI"
-    },
-    bridging: {
-      title: "KẾT NỐI THẾ GIỚI",
-      p1: "Bắt nguồn từ bối cảnh sáng tạo năng động của Hội An và được dẫn dắt bởi hơn hai thập kỷ lãnh đạo toàn cầu về UI/UX, trò chơi và kể chuyện kỹ thuật số, Neon Shaman Studios kết nối các phương pháp thực hành tốt nhất quốc tế với nguồn nhân lực phát triển nhanh nhất Việt Nam.",
-      p2: "Chúng tôi tận dụng các quy trình AI độc quyền và tạo mẫu nhanh để tạo ra các sản phẩm full-stack kết hợp chiều sâu chiến lược với sự cộng hưởng văn hóa: chiến dịch tiếp thị, ứng dụng công nghệ mới nổi, trò chơi độc lập, trải nghiệm nhập vai và phim AI điện ảnh.",
-      p3: "Mỗi dự án đều được thiết kế để hoạt động hiệu quả trong các thị trường cạnh tranh, khơi dậy sự tương tác và xây dựng giá trị lâu dài—bắt đầu từ miền Trung Việt Nam và mở rộng ra toàn khu vực Đông Nam Á và hơn thế nữa.",
-      badge1: "GỐC RỄ HỘI AN",
-      badge2: "TẦM VƯƠN TOÀN CẦU"
-    },
-    services: {
-      title: "CHÚNG TÔI LÀM GÌ",
-      items: [
-        { title: "TIẾP THỊ &\nTHƯƠNG HIỆU", icon: Megaphone },
-        { title: "PHÁT TRIỂN\nWEB & APP", icon: MonitorSmartphone },
-        { title: "AI &\nCÔNG NGHỆ MỚI", icon: Cpu },
-        { title: "SẢN XUẤT\nVIDEO", icon: Clapperboard },
-        { title: "PHÁT TRIỂN\nGAME", icon: Gamepad2 },
-        { title: "TƯ VẤN\nSÁNG TẠO", icon: Lightbulb }
-      ]
-    },
-    experience: {
-      title: "KINH NGHIỆM"
-    },
-    team: {
-      title: "ĐỘI NGŨ",
-      members: [
-        { name: "JODY", role: "NGƯỜI SÁNG LẬP &\nGIÁM ĐỐC SÁNG TẠO", img: "/images/J.jpg" },
-        { name: "EMINAM", role: "NHÀ PHÁT TRIỂN\nSÁNG LẬP", img: "/images/N.png" },
-        { name: "TIEN", role: "NHÀ PHÁT TRIỂN\nSÁNG LẬP", img: "/images/T.png" }
-      ]
-    },
-    cta: {
-      title: "SẴN SÀNG ĐÓN NHẬN\nTƯƠNG LAI?",
-      button: "HỢP TÁC VỚI CHÚNG TÔI"
-    },
-    contact: {
-      title: "HỢP TÁC VỚI CHÚNG TÔI",
-      name: "Họ và tên",
-      phone: "Số điện thoại",
-      email: "Địa chỉ Email",
-      message: "Tin nhắn",
-      submit: "GỬI TIN NHẮN",
-      submitting: "ĐANG GỬI...",
-      success: "Tin nhắn đã được gửi thành công!",
-      close: "Đóng"
-    },
-    footer: {
-      copyright: "© 2023 Neon Shaman Studios. Hội An, Việt Nam."
-    }
   }
 };
 
 export default function App() {
-  const [lang, setLang] = useState<'en' | 'vi'>('en');
-  const t = translations[lang];
+  const t = translations.en;
 
   // SEO
   useEffect(() => {
-    document.title = lang === 'en' ? "Neon Shaman Studios | Vietnam's First Full-Stack Creative Studio" : "Neon Shaman Studios | Studio Sáng Tạo Full-Stack Đầu Tiên Tại Việt Nam";
+    document.title = "Neon Shaman Studios | Vietnam's First Full-Stack Creative Studio";
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) {
       metaDesc.setAttribute('content', t.hero.subtitle.replace(/<[^>]*>?/gm, ''));
@@ -146,7 +89,7 @@ export default function App() {
       meta.content = t.hero.subtitle.replace(/<[^>]*>?/gm, '');
       document.head.appendChild(meta);
     }
-  }, [lang, t]);
+  }, [t]);
 
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
@@ -175,7 +118,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
@@ -220,7 +163,7 @@ export default function App() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
   };
@@ -237,36 +180,20 @@ export default function App() {
             className="h-8 md:h-10 w-auto object-contain"
           />
         </div>
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setLang(lang === 'en' ? 'vi' : 'en')}
-            className="flex items-center gap-2 text-sm font-medium bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-full transition-colors"
-          >
-            <span className={lang === 'en' ? 'text-white' : 'text-gray-500'}>EN</span>
-            <span className="text-gray-600">/</span>
-            <span className={lang === 'vi' ? 'text-white' : 'text-gray-500'}>VI</span>
-          </button>
-        </div>
       </header>
 
       {/* Hero Section */}
       <section className="relative min-h-[100svh] flex items-center justify-center overflow-hidden pt-24 pb-12">
         <motion.div 
           style={{ y: heroY, opacity: heroOpacity }}
-          className="absolute inset-0 z-0"
+          className="absolute -top-10 left-0 right-0 h-[calc(100%+40px)] z-0"
         >
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-dark-bg/60 to-dark-bg z-10" />
-          <div className="absolute inset-0 bg-dark-bg/40 z-10" />
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            className="w-full h-full object-cover object-center"
-          >
-            {/* Replace this src with your actual video URL or local path */}
-            <source src="https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" type="video/mp4" />
-          </video>
+          <img 
+            src="/images/hero-bg.jpg" 
+            alt="Neon Shaman Studios Hero Background"
+            className="w-full h-full object-cover object-[center_top]"
+          />
         </motion.div>
 
         <div className="relative z-20 text-center px-4 max-w-4xl mx-auto flex flex-col items-center mt-8">
@@ -371,23 +298,22 @@ export default function App() {
             <div className="w-16 h-1 bg-neon-pink mt-2" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 bg-white/10 gap-px border border-white/10 rounded-3xl overflow-hidden">
             {t.services.items.map((item, index) => {
               const Icon = item.icon;
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 30 }}
+                  initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ scale: 1.03 }}
-                  className="border border-neon-pink/30 rounded-[2rem] p-10 flex flex-col items-center justify-center text-center gap-6 bg-[#121212] hover:bg-[#1a1a1a] box-glow-hover transition-all duration-300 cursor-pointer group relative"
+                  className="bg-[#161616] p-10 md:p-14 flex flex-col items-center justify-center text-center gap-6"
                 >
-                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-neon-pink/20 transition-colors">
-                    <Icon className="w-8 h-8 text-neon-pink" />
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
+                    <Icon className="w-8 h-8 text-neon-pink opacity-80" />
                   </div>
-                  <h3 className="font-display font-semibold text-sm tracking-widest whitespace-pre-line leading-relaxed">{item.title}</h3>
+                  <h3 className="font-display font-semibold text-sm tracking-widest whitespace-pre-line leading-relaxed text-gray-300">{item.title}</h3>
                 </motion.div>
               );
             })}
@@ -431,40 +357,6 @@ export default function App() {
         </div>
       </section>
 
-      <div className="w-full h-px bg-white/5" />
-
-      {/* The Team */}
-      <section className="py-20 md:py-24 px-6 md:px-12 bg-[#161616]">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-start mb-12">
-            <h2 className="font-display text-2xl md:text-3xl font-bold tracking-wide mb-4">{t.team.title}</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {t.team.members.map((member, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-                className="bg-[#1A1A1A] rounded-[2rem] overflow-hidden border border-white/5 hover:border-neon-pink/30 transition-colors group p-8 md:p-12 flex flex-col items-center text-center box-glow-hover"
-              >
-                <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden mb-6 border-2 border-white/10 group-hover:border-neon-pink/50 transition-colors">
-                  <img 
-                    src={member.img} 
-                    alt={member.name} 
-                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-110"
-                    referrerPolicy="no-referrer"
-                  />
-                </div>
-                <h3 className="font-display font-bold text-xl mb-2 tracking-wider uppercase">{member.name}</h3>
-                <p className="text-gray-400 font-display text-xs tracking-[0.2em] whitespace-pre-line leading-relaxed uppercase">{member.role}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <div className="w-full h-px bg-white/5" />
 
